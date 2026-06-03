@@ -1,9 +1,9 @@
-import { Router } from "express";
-import { getFaces, rollDice } from "../controller/dice.controller";
+import { Router } from 'express';
+import { getHistory_, postRoll } from '../controllers/roll.controller';
 
 const router = Router();
 
-router.get("/", getFaces);
-router.post("/roll", rollDice);
+router.get('/', getHistory_);
+router.post('/', postRoll);
 
 export default router;

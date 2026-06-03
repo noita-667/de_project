@@ -1,19 +1,20 @@
-import { Request, Response } from "express";
-import { z } from "zod";
-import { isValidDice, roll, rollMany, getValidFaces } from "../services/dice.service";
+import { Request, Response } from 'express';
+import { z } from 'zod';
+import { getHistory, saveRoll, isValidType } from '../services/roll.service';
 
 const RollBody = z.object({
-  dice: z.number({ required_error: "dice is required" }),
-  count: z.number().int().min(1).max(20).optional().default(1),
+  type: z.string(),
+  label: z.string(),
+  value: z.number().int().min(1),
 });
 
-// GET /dice
-export function getFaces(_req: Request, res: Response): void {
-  res.json({ validFaces: getValidFaces() });
+// GET /rolls
+export function getHistory_(req: Request, res: Response): void {
+  res.json(getHistory());
 }
 
-// POST /dice/roll
-export function rollDice(req: Request, res: Response): void {
+// POST /rolls
+export function postRoll(req: Request, res: Response): void {
   const parsed = RollBody.safeParse(req.body);
 
   if (!parsed.success) {
@@ -21,13 +22,13 @@ export function rollDice(req: Request, res: Response): void {
     return;
   }
 
-  const { dice, count } = parsed.data;
+  const { type, label, value } = parsed.data;
 
-  if (!isValidDice(dice)) {
-    res.status(400).json({ error: `Invalid dice. Valid values: ${getValidFaces().join(", ")}` });
+  if (!isValidType(type)) {
+    res.status(400).json({ error: 'Invalid dice type. Valid: d6, d12, d20' });
     return;
   }
 
-  const results = count === 1 ? roll(dice) : rollMany(dice, count);
-  res.json({ success: true, data: results });
+  const entry = saveRoll(type, label, value);
+  res.status(201).json(entry);
 }

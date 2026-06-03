@@ -1,23 +1,27 @@
-import { DiceFaces, DiceRoll, VALID_FACES } from "../model/dice.model";
+import { v4 as uuidv4 } from 'uuid';
+import { DiceType, RollEntry } from '../models/roll.model';
 
-export function isValidDice(value: unknown): value is DiceFaces {
-  return VALID_FACES.includes(value as DiceFaces);
+const VALID_TYPES: DiceType[] = ['d6', 'd12', 'd20'];
+
+// Store in-memory
+const rolls: RollEntry[] = [];
+
+export function isValidType(value: unknown): value is DiceType {
+  return VALID_TYPES.includes(value as DiceType);
 }
 
-export function roll(faces: DiceFaces): DiceRoll {
-  return {
-    dice: faces,
-    result: Math.floor(Math.random() * faces) + 1,
-    min: 1,
-    max: faces,
-    rolledAt: new Date().toISOString(),
+export function getHistory(): RollEntry[] {
+  return [...rolls].reverse(); // plus récent en premier
+}
+
+export function saveRoll(type: DiceType, label: string, value: number): RollEntry {
+  const entry: RollEntry = {
+    id: uuidv4(),
+    type,
+    label,
+    value,
+    timestamp: Date.now(),
   };
-}
-
-export function rollMany(faces: DiceFaces, count: number): DiceRoll[] {
-  return Array.from({ length: count }, () => roll(faces));
-}
-
-export function getValidFaces(): readonly number[] {
-  return VALID_FACES;
+  rolls.push(entry);
+  return entry;
 }
