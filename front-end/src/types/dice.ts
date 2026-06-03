@@ -27,4 +27,6 @@ export interface RollEntry {
   value:     number;
   /** Horodatage Unix en ms */
   timestamp: number;
+  /** Prénom du joueur qui a lancé */
+  player:    string;
 }

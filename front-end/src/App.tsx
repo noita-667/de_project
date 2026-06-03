@@ -68,6 +68,8 @@ export default function App() {
   const [isRolling, setIsRolling] = useState(false);
   /** Nombre de faces du dé en cours de lancer (pour le cycling de l'AnimatedDie) */
   const [rollingFaces, setRollingFaces] = useState(6);
+  /** Prénom du joueur actif */
+  const [player, setPlayer] = useState('');
 
   /** Dés créés par l'utilisateur (filtrés depuis allDice) */
   const customDice = allDice.filter((d) => d.custom);
@@ -175,7 +177,7 @@ export default function App() {
       fetch(`${API_URL}/rolls`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: die.type, label: die.label, value }),
+        body: JSON.stringify({ type: die.type, label: die.label, value, player: player.trim() || 'Anonyme' }),
       })
         .catch((err) => console.warn('[App] Impossible de sauvegarder le lancer.', err))
         .finally(() => fetchHistory());
@@ -189,6 +191,29 @@ export default function App() {
 
       <main style={{ maxWidth: 400, margin: '2rem auto', padding: '0 1rem', fontFamily: 'sans-serif' }}>
         <h1 style={{ fontSize: 16, fontWeight: 500, marginBottom: '1.5rem' }}>Lancer de dés</h1>
+
+        {/* Champ de saisie du prénom du joueur */}
+        <div style={{ marginBottom: '1.25rem' }}>
+          <div style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#888', marginBottom: 6 }}>
+            Joueur
+          </div>
+          <input
+            type="text"
+            placeholder="Ton prénom"
+            value={player}
+            onChange={(e) => setPlayer(e.target.value)}
+            maxLength={50}
+            style={{
+              width: '100%',
+              boxSizing: 'border-box',
+              padding: '0.5rem 0.75rem',
+              borderRadius: 8,
+              border: '1.5px solid #ccc',
+              fontSize: 14,
+              outline: 'none',
+            }}
+          />
+        </div>
 
         {/* Sélecteur de dé : affiche tous les dés (base + custom) */}
         <DicePicker diceList={allDice} selected={selected} onSelect={setSelected} />
